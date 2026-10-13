@@ -6,7 +6,8 @@ namespace IeradumuParvaldnieksDataModels
 {
     public class LabotIeradumuDataModel
     {
-        public string Apraksts {  get; set; }
+        public Guid IeradumsID { get; set; }
+        public string Apraksts { get; set; }
         public string Nosaukums { get; set; }
     }
 }

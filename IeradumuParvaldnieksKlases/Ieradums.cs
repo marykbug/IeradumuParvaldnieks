@@ -39,12 +39,12 @@ namespace IeradumuParvaldnieksKlases
         }
         public Ieradums(Guid id, string nos, string lietid, string apr, IeradumuAtkartosana atkart)
         {
-            if (lietid == null || lietid.Length == 0)
+            if (string.IsNullOrWhiteSpace(lietid))
             {
                 throw new ArgumentException("Lietotāja ID nedrīkst būt tukšs.");
             }
 
-            if (nos == null || nos.Length == 0 || nos.Length > 100)
+            if (string.IsNullOrWhiteSpace(nos) || nos.Length > 100)
             {
                 throw new ArgumentException("Ieraduma nosaukumam jābūt no 1 līdz 100 rakstzīmēm.");
             }
@@ -71,11 +71,11 @@ namespace IeradumuParvaldnieksKlases
         }
         public void Labot(string jaunNos, string jaunApr)
         {
-            if (jaunNos == null || jaunNos.Length == 0 || jaunNos.Length > 100)
+            if (string.IsNullOrWhiteSpace(jaunNos) || jaunNos.Length > 100)
             {
                 throw new ArgumentException("Ieraduma nosaukumam jābūt no 1 līdz 100 rakstzīmēm.");
             }
-            if (jaunApr == null || jaunApr.Length == 0)
+            if (string.IsNullOrWhiteSpace(jaunApr))
             {
                 throw new ArgumentException("Ieraduma apraksts nedrīkst būt tukšs.");
             }

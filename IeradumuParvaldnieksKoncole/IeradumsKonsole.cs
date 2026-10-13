@@ -47,4 +47,40 @@ foreach (string lietotajs in lietotaji)
             Console.WriteLine();
         }
     }
+
+}
+Console.WriteLine("Biznesa noteikumu pārbaude:");
+
+Ieradums parbaudesIeradums = new Ieradums(
+    Guid.NewGuid(),
+    "Pārbaudes ieradums",
+    "demo-user-test",
+    "Ieradums biznesa noteikumu pārbaudei.",
+    IeradumuAtkartosana.Diena
+);
+
+DateOnly sodien = DateOnly.FromDateTime(DateTime.Today);
+
+parbaudesIeradums.AtzimetKaIzpilditu(sodien);
+
+try
+{
+    parbaudesIeradums.AtzimetKaIzpilditu(sodien);
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine("Atkārtotas izpildes pārbaude: " + ex.Message);
+}
+
+parbaudesIeradums.Arhivet();
+
+try
+{
+    parbaudesIeradums.AtzimetKaIzpilditu(
+        DateOnly.FromDateTime(DateTime.Today.AddDays(1))
+    );
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine("Arhivēta ieraduma pārbaude: " + ex.Message);
 }
