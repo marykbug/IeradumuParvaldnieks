@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="IeradumuParvaldnieksDataModels/IeradumuParvaldnieksDataModels.csproj" />
+  <Project Path="IeradumuParvaldnieksKlases/IeradumuParvaldnieksKlases.csproj" />
+  <Project Path="IeradumuParvaldnieksKoncole/IeradumuParvaldnieksKoncole.csproj" />
+  <Project Path="IeradumuParvaldnieksTestData/IeradumuParvaldnieksTestData.csproj" />
+</Solution>
