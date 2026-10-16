@@ -2,5 +2,8 @@
   <Project Path="IeradumuParvaldnieksDataModels/IeradumuParvaldnieksDataModels.csproj" />
   <Project Path="IeradumuParvaldnieksKlases/IeradumuParvaldnieksKlases.csproj" />
   <Project Path="IeradumuParvaldnieksKoncole/IeradumuParvaldnieksKoncole.csproj" />
+  <Project Path="IeradumuParvaldnieksMAUI/IeradumuParvaldnieksMAUI.csproj" Id="76188bca-3b46-489d-a374-e2685acfe6d4">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="IeradumuParvaldnieksTestData/IeradumuParvaldnieksTestData.csproj" />
 </Solution>
