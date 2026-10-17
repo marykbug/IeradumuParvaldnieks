@@ -117,5 +117,15 @@ namespace IeradumuParvaldnieksKlases
 
             return false;
         }
+        public string IzpilditsSodien
+        {
+            get {
+                if (IrIzpilditsSodien())
+                {
+                    return "Jā";
+                }
+                return "Nē";
+            }
+        }
     }
 }

@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+Pievienojam ViewModel un Ieradums klasi,
+lai XAML zinātu, no kurienes ņemt datus.
+x:DataType palīdz pārbaudīt, vai Binding nosaukumi ir pareizi.
+-->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:IeradumuParvaldnieksMAUI.ViewModels"
+             xmlns:klases="clr-namespace:IeradumuParvaldnieksKlases;assembly=IeradumuParvaldnieksKlases"
              x:Class="IeradumuParvaldnieksMAUI.Views.IeradumuSaraksts"
-             Title="IeradumuSaraksts">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="viewModels:IeradumuSarakstsViewModel"
+             Title="Mani Ieradumi">
+    <CollectionView ItemsSource="{Binding Ieradums}">
+        <CollectionView.ItemTemplate>
+            <!-- Katrs CollectionView elements attēlo vienu Ieradums objektu -->
+            <DataTemplate x:DataType="klases:Ieradums">
+                <VerticalStackLayout Padding="10">
+                    <Label Text="{Binding Nosaukums}" FontSize="20" />
+                    <Label Text="{Binding Status}" />
+                    <Label Text="{Binding Atkartosana}" />
+                    <Label Text="{Binding IzpilditsSodien, StringFormat='Izpildīts šodien: {0}'}" />
+                </VerticalStackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
 </ContentPage>
