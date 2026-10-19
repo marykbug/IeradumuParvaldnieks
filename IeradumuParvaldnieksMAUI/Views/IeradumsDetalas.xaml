@@ -33,6 +33,8 @@
             <Label Text="{Binding IzpilditsSodien}" />
             <Button Text="Atzīmēt kā izpildītu"
                     Command="{Binding AtzimetKaIzpildituCommand}" />
+            <Button Text="Labot"
+                    Command="{Binding LabotCommand}" />
             <Button Text="Arhivēt"
                     Command="{Binding ArhivetCommand}" />
         </VerticalStackLayout>

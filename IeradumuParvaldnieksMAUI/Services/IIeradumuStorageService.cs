@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using IeradumuParvaldnieksKlases;
 namespace IeradumuParvaldnieksMAUI.Services
 {
-    public class IIeradumuStorageService
+    public interface IIeradumuStorageService
     {
+        // Ielādē saglabātos ieradumus.
+        Task<List<Ieradums>> IeladetAsync();
+        // Saglabā ieradumus lokālajā failā.
+        Task SaglabatAsync(IEnumerable<Ieradums> ieradumi);
     }
 }

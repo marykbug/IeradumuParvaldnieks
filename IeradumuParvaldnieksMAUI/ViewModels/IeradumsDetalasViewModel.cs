@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using IeradumuParvaldnieksKlases;
+﻿using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Views;
 using System.ComponentModel;
 namespace IeradumuParvaldnieksMAUI.ViewModels
 {
-    public class IeradumsDetalasViewModel : INotifyPropertyChanged
+    public partial class IeradumsDetalasViewModel : INotifyPropertyChanged
     {
         public Ieradums Ieradums { get; set; }
+        private readonly Func<Task> saglabatDatus;
         public Command AtzimetKaIzpildituCommand { get; }
-        public IeradumsDetalasViewModel(Ieradums ieradums)
+        public Command LabotCommand { get; }
+        public IeradumsDetalasViewModel(
+            Ieradums ieradums,
+            Func<Task> saglabatDatus)
         {
-            if (ieradums == null)
-            {
-                throw new ArgumentException("Ieradumam jābūt norādītam.");
-            }
-
             Ieradums = ieradums;
+            this.saglabatDatus = saglabatDatus;
+
             AtzimetKaIzpildituCommand = new Command(AtzimetKaIzpilditu);
             ArhivetCommand = new Command(Arhivet);
+            LabotCommand = new Command(Labot);
         }
         public string IzpilditsSodien
         {
@@ -36,10 +36,10 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
                 );
                 return;
             }
+            Ieradums.AtzimetKaIzpilditu(DateOnly.FromDateTime(DateTime.Today));
+            // Saglabā izmaiņas lokālajā failā.
+            await saglabatDatus();
 
-            Ieradums.AtzimetKaIzpilditu(
-                DateOnly.FromDateTime(DateTime.Today)
-            );
             PropertyChanged?.Invoke(
                 this,
                 new PropertyChangedEventArgs(nameof(IzpilditsSodien))
@@ -55,13 +55,35 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
                     "Ieradums jau ir arhivēts.",
                     "Labi"
                 );
-
                 return;
             }
             Ieradums.Arhivet();
+            // Saglabā izmaiņas lokālajā failā.
+            await saglabatDatus();
             PropertyChanged?.Invoke(
                 this,
                 new PropertyChangedEventArgs(nameof(Ieradums))
+            );
+        }
+        private async void Labot()
+        {
+            await Shell.Current.Navigation.PushAsync(
+                new IeradumsForma(
+                    Ieradums,
+                    saglabatDatus
+                )
+            );
+        }
+        public void AtjaunotDatus()
+        {
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(nameof(Ieradums))
+            );
+
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(nameof(IzpilditsSodien))
             );
         }
     }

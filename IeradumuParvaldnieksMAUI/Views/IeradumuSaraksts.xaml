@@ -11,7 +11,10 @@ x:DataType palīdz pārbaudīt, vai Binding nosaukumi ir pareizi.
              x:Class="IeradumuParvaldnieksMAUI.Views.IeradumuSaraksts"
              x:DataType="viewModels:IeradumuSarakstsViewModel"
              Title="Mani Ieradumi">
-    <CollectionView ItemsSource="{Binding Ieradums}"
+    <VerticalStackLayout>
+        <Button Text="Jauns ieradums" Command="{Binding JaunsIeradumsCommand}" />
+        <Button Text="Arhivētie ieradumi" Command="{Binding ArhivetieIeradumiCommand}" />
+        <CollectionView ItemsSource="{Binding AktivieIeradumi}"
                 SelectionMode="Single"
                 SelectionChanged="IeradumsSelectionChanged">
         <CollectionView.ItemTemplate>
@@ -25,4 +28,5 @@ x:DataType palīdz pārbaudīt, vai Binding nosaukumi ir pareizi.
             </DataTemplate>
         </CollectionView.ItemTemplate>
     </CollectionView>
+    </VerticalStackLayout>
 </ContentPage>
