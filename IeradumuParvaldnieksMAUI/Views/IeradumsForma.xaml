@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:IeradumuParvaldnieksMAUI.ViewModels"
-             x:Class="IeradumuParvaldnieksMAUI.Views.IeradumsForma"
-             x:DataType="viewModels:IeradumsFormaViewModel"
-             Title="Ieradums">
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewModels="clr-namespace:IeradumuParvaldnieksMAUI.ViewModels"
+    x:Class="IeradumuParvaldnieksMAUI.Views.IeradumsForma"
+    x:DataType="viewModels:IeradumsFormaViewModel"
+    Title="Ieradums">
     <ScrollView>
         <VerticalStackLayout
             Padding="20"
@@ -23,6 +25,48 @@
                    FontAttributes="Bold" />
             <Picker ItemsSource="{Binding AtkartosanasVeidi}"
                     SelectedItem="{Binding Atkartosana}" />
+            <!-- Nedēļas dienas rāda tikai tad, ja izvēlēta atkārtošanās "Nedela". -->
+            <VerticalStackLayout
+                IsVisible="{Binding RaditNedelasDienas}"
+                Spacing="10">
+                <Label Text="Nedēļas dienas:"
+                       FontAttributes="Bold" />
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Pirmdiena}" />
+                    <Label Text="Pirmdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Otrdiena}" />
+                    <Label Text="Otrdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Tresdiena}" />
+                    <Label Text="Trešdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Ceturtdiena}" />
+                    <Label Text="Ceturtdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Piektdiena}" />
+                    <Label Text="Piektdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Sestdiena}" />
+                    <Label Text="Sestdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <CheckBox IsChecked="{Binding Svetdiena}" />
+                    <Label Text="Svētdiena"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
             <Button Text="Saglabāt"
                     Command="{Binding SaglabatCommand}" />
         </VerticalStackLayout>

@@ -47,6 +47,7 @@ namespace IeradumuParvaldnieksMAUI.Services
                     modelis.LietotajsID,
                     modelis.Apraksts,
                     modelis.Atkartosana,
+                    modelis.NedelasDienas,
                     modelis.Status,
                     modelis.Izveidots,
                     modelis.Labots,
@@ -60,7 +61,6 @@ namespace IeradumuParvaldnieksMAUI.Services
         {
             List<IeradumsLocalModel> saglabajamieIeradumi =
                 new List<IeradumsLocalModel>();
-
             foreach (Ieradums ieradums in ieradumi)
             {
                 IeradumsLocalModel modelis = new IeradumsLocalModel
@@ -74,25 +74,26 @@ namespace IeradumuParvaldnieksMAUI.Services
                     Izveidots = ieradums.Izveidots,
                     Labots = ieradums.Labots
                 };
-
+                // Saglabā izvēlētās nedēļas dienas.
+                foreach (NedelasDienas diena in ieradums.NedelasDienas)
+                {
+                    modelis.NedelasDienas.Add(diena);
+                }
+                // Saglabā ieraduma izpildes datumus.
                 foreach (IeradumaIzpilde izpilde in ieradums.Izpildes)
                 {
                     modelis.IzpildesDatumi.Add(izpilde.Datums);
                 }
-
                 saglabajamieIeradumi.Add(modelis);
             }
-
             JsonSerializerOptions opcijas = new JsonSerializerOptions
             {
                 WriteIndented = true
             };
-
             string json = JsonSerializer.Serialize(
                 saglabajamieIeradumi,
                 opcijas
             );
-
             await File.WriteAllTextAsync(failaCels, json);
         }
     }

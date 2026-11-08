@@ -45,9 +45,15 @@ namespace IeradumuParvaldnieksTestData
             Ieradums ieradums3 = new Ieradums(
                 Guid.NewGuid(),
                 "Sports",
-                lietotajs2,
-                "Veikt fiziskās aktivitātes sporta zālē.",
-                IeradumuAtkartosana.Nedela
+                "demo-user-2",
+                "Treniņš",
+                IeradumuAtkartosana.Nedela,
+                new List<NedelasDienas>
+                {
+                    NedelasDienas.Pirmdiena,
+                    NedelasDienas.Tresdiena,
+                    NedelasDienas.Piektdiena
+                }
             );
 
             ieradums3.AtzimetKaIzpilditu(

@@ -10,6 +10,7 @@ namespace IeradumuParvaldnieksMAUI.Models
         public string Apraksts { get; set; } = "";
         public IeradumuStatus Status { get; set; }
         public IeradumuAtkartosana Atkartosana { get; set; }
+        public List<NedelasDienas> NedelasDienas { get; set; } = new();
         public DateTimeOffset Izveidots { get; set; }
         public DateTimeOffset Labots { get; set; }
         public List<DateOnly> IzpildesDatumi { get; set; } = new();
