@@ -1,30 +1,27 @@
-using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Services;
 using IeradumuParvaldnieksMAUI.ViewModels;
-using System.Collections.ObjectModel;
 
 namespace IeradumuParvaldnieksMAUI.Views;
 
 public partial class ArhivetieIeradumi : ContentPage
 {
     public ArhivetieIeradumi(
-        ObservableCollection<Ieradums> visiIeradumi,
-        Func<Task> saglabatDatus)
+        APIIeradumuService apiService)
     {
         InitializeComponent();
 
         BindingContext = new ArhivetieIeradumiViewModel(
-            visiIeradumi,
-            saglabatDatus
+            apiService
         );
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
         if (BindingContext is ArhivetieIeradumiViewModel viewModel)
         {
-            viewModel.AtjaunotSarakstu();
+            await viewModel.IeladetDatusAsync();
         }
     }
 }

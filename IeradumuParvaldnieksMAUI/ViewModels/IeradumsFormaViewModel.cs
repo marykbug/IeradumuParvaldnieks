@@ -1,16 +1,18 @@
-﻿using IeradumuParvaldnieksKlases;
-using IeradumuParvaldnieksMAUI.Views;
-using System.Collections.ObjectModel;
+﻿using IeradumuParvaldnieksDataModels;
+using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Services;
 using System.ComponentModel;
 
 namespace IeradumuParvaldnieksMAUI.ViewModels
 {
     public partial class IeradumsFormaViewModel : INotifyPropertyChanged
     {
-        private Ieradums? ieradums;
-        private ObservableCollection<Ieradums>? ieradumi;
-        private string? lietotajsID;
+        private readonly APIIeradumuService apiService;
+        private readonly Ieradums? ieradums;
+        private readonly string lietotajsID;
+
         public event PropertyChangedEventHandler? PropertyChanged;
+
         public string Nosaukums { get; set; }
         public string Apraksts { get; set; }
 
@@ -47,7 +49,6 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
             }
         }
 
-        // Norāda, vai formā jārāda nedēļas dienu izvēle.
         public bool RaditNedelasDienas
         {
             get
@@ -56,19 +57,19 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
             }
         }
 
-        private readonly Func<Task> saglabatDatus;
+        public IeradumuAtkartosana[] AtkartosanasVeidi { get; } =
+            Enum.GetValues<IeradumuAtkartosana>();
 
         public Command SaglabatCommand { get; }
 
-        // Jauna ieraduma izveide
+
+        // Jauna ieraduma izveide.
         public IeradumsFormaViewModel(
-            ObservableCollection<Ieradums> ieradumi,
-            string lietotajsID,
-            Func<Task> saglabatDatus)
+            APIIeradumuService apiService,
+            string lietotajsID)
         {
-            this.ieradumi = ieradumi;
+            this.apiService = apiService;
             this.lietotajsID = lietotajsID;
-            this.saglabatDatus = saglabatDatus;
 
             Nosaukums = "";
             Apraksts = "";
@@ -77,21 +78,20 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
             SaglabatCommand = new Command(Saglabat);
         }
 
-        // Esoša ieraduma labošana
+
+        // Esoša ieraduma labošana.
         public IeradumsFormaViewModel(
             Ieradums ieradums,
-            Func<Task> saglabatDatus)
+            APIIeradumuService apiService)
         {
             this.ieradums = ieradums;
-            this.saglabatDatus = saglabatDatus;
-
+            this.apiService = apiService;
             lietotajsID = ieradums.LietotajsID;
 
             Nosaukums = ieradums.Nosaukums;
             Apraksts = ieradums.Apraksts;
             Atkartosana = ieradums.Atkartosana;
 
-            // Atzīmē iepriekš saglabātās nedēļas dienas.
             foreach (NedelasDienas diena in ieradums.NedelasDienas)
             {
                 switch (diena)
@@ -129,63 +129,48 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
             SaglabatCommand = new Command(Saglabat);
         }
 
-        public IeradumuAtkartosana[] AtkartosanasVeidi { get; } =
-            Enum.GetValues<IeradumuAtkartosana>();
 
-        // Izveido sarakstu ar lietotāja izvēlētajām nedēļas dienām.
-        private List<NedelasDienas> IegutIzveletasDienas()
+        private List<string> IegutIzveletasDienas()
         {
-            List<NedelasDienas> dienas =
-                new List<NedelasDienas>();
-            // Nedēļas dienas nepieciešamas tikai nedēļas atkārtojumam.
+            List<string> dienas = new List<string>();
+
             if (Atkartosana != IeradumuAtkartosana.Nedela)
             {
                 return dienas;
             }
 
             if (Pirmdiena)
-            {
-                dienas.Add(NedelasDienas.Pirmdiena);
-            }
+                dienas.Add(NedelasDienas.Pirmdiena.ToString());
 
             if (Otrdiena)
-            {
-                dienas.Add(NedelasDienas.Otrdiena);
-            }
+                dienas.Add(NedelasDienas.Otrdiena.ToString());
 
             if (Tresdiena)
-            {
-                dienas.Add(NedelasDienas.Tresdiena);
-            }
+                dienas.Add(NedelasDienas.Tresdiena.ToString());
 
             if (Ceturtdiena)
-            {
-                dienas.Add(NedelasDienas.Ceturtdiena);
-            }
+                dienas.Add(NedelasDienas.Ceturtdiena.ToString());
 
             if (Piektdiena)
-            {
-                dienas.Add(NedelasDienas.Piektdiena);
-            }
+                dienas.Add(NedelasDienas.Piektdiena.ToString());
 
             if (Sestdiena)
-            {
-                dienas.Add(NedelasDienas.Sestdiena);
-            }
+                dienas.Add(NedelasDienas.Sestdiena.ToString());
 
             if (Svetdiena)
-            {
-                dienas.Add(NedelasDienas.Svetdiena);
-            }
+                dienas.Add(NedelasDienas.Svetdiena.ToString());
 
             return dienas;
         }
+
+
         private async void Saglabat()
         {
             try
             {
-                List<NedelasDienas> izveletasDienas =
+                List<string> izveletasDienas =
                     IegutIzveletasDienas();
+
                 if (Atkartosana == IeradumuAtkartosana.Nedela &&
                     izveletasDienas.Count == 0)
                 {
@@ -197,40 +182,50 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
 
                     return;
                 }
-                if (ieradums != null)
+
+                if (ieradums == null)
                 {
-                    ieradums.Labot(
-                        Nosaukums,
-                        Apraksts,
-                        Atkartosana,
-                        izveletasDienas
-                    );
+                    IzveidotIeradumsDataModel modelis =
+                        new IzveidotIeradumsDataModel
+                        {
+                            LietotajsID = lietotajsID,
+                            Nosaukums = Nosaukums,
+                            Apraksts = Apraksts,
+                            Atkartosana = Atkartosana.ToString(),
+                            NedelasDienas = izveletasDienas
+                        };
+
+                    await apiService.IzveidotAsync(modelis);
                 }
                 else
                 {
-                    if (ieradumi == null ||
-                        string.IsNullOrWhiteSpace(lietotajsID))
-                    {
-                        return;
-                    }
+                    LabotIeradumuDataModel modelis =
+                        new LabotIeradumuDataModel
+                        {
+                            IeradumsID = ieradums.Id,
+                            Nosaukums = Nosaukums,
+                            Apraksts = Apraksts,
+                            Atkartosana = Atkartosana.ToString(),
+                            NedelasDienas = izveletasDienas
+                        };
 
-                    Ieradums jaunsIeradums = new Ieradums(
-                        Guid.NewGuid(),
-                        Nosaukums,
-                        lietotajsID,
-                        Apraksts,
-                        Atkartosana,
-                        izveletasDienas
+                    await apiService.LabotAsync(
+                        ieradums.Id,
+                        modelis
                     );
-
-                    ieradumi.Add(jaunsIeradums);
                 }
-
-                await saglabatDatus();
 
                 await Shell.Current.Navigation.PopAsync();
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    "Neizdevās izveidot savienojumu ar API.",
+                    "Labi"
+                );
+            }
+            catch (InvalidOperationException ex)
             {
                 await Shell.Current.DisplayAlertAsync(
                     "Kļūda",

@@ -1,27 +1,33 @@
 ﻿using IeradumuParvaldnieksKlases;
 using IeradumuParvaldnieksMAUI.Services;
 using IeradumuParvaldnieksMAUI.Views;
-using IeradumuParvaldnieksTestData;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+
 namespace IeradumuParvaldnieksMAUI.ViewModels
 {
     public partial class IeradumuSarakstsViewModel : INotifyPropertyChanged
     {
         // Fiksēts testa lietotājs, kuram tiks pievienoti jaunizveidotie ieradumi.
         public string PasreizejaisLietotajsID { get; } = "demo-user-1";
-        // Visi ieradumi, kas tiek saglabāti lokālajā failā.
+
+        // Visi ieradumi, kas saņemti no API.
         public ObservableCollection<Ieradums> Ieradums { get; set; }
+
         // Galvenajā skatā tiek rādīti tikai aktīvie ieradumi.
         public ObservableCollection<Ieradums> AktivieIeradumi { get; set; }
+
         public event PropertyChangedEventHandler? PropertyChanged;
-        private readonly IIeradumuStorageService storageService;
-        private bool datiIeladeti = false;
+
+        // Serviss saziņai ar API.
+        public APIIeradumuService ApiService { get; }
+
         public Command JaunsIeradumsCommand { get; }
         public Command ArhivetieIeradumiCommand { get; }
+
         public IeradumuSarakstsViewModel()
         {
-            storageService = new JSONIeradumuStorageService();
+            ApiService = new APIIeradumuService();
 
             Ieradums = new ObservableCollection<Ieradums>();
             AktivieIeradumi = new ObservableCollection<Ieradums>();
@@ -30,9 +36,11 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
             ArhivetieIeradumiCommand =
                 new Command(AtvertArhivetosIeradumus);
         }
+
         public void AtjaunotSarakstu()
         {
             AktivieIeradumi.Clear();
+
             foreach (Ieradums ieradums in Ieradums)
             {
                 if (ieradums.Status == IeradumuStatus.Aktivs)
@@ -40,74 +48,68 @@ namespace IeradumuParvaldnieksMAUI.ViewModels
                     AktivieIeradumi.Add(ieradums);
                 }
             }
+
             PropertyChanged?.Invoke(
                 this,
                 new PropertyChangedEventArgs(nameof(AktivieIeradumi))
             );
         }
+
         private async void JaunsIeradums()
         {
             await Shell.Current.Navigation.PushAsync(
                 new IeradumsForma(
-                    Ieradums,
-                    PasreizejaisLietotajsID,
-                    SaglabatDatusAsync
+                    ApiService,
+                    PasreizejaisLietotajsID
                 )
             );
         }
+
         private async void AtvertArhivetosIeradumus()
         {
             await Shell.Current.Navigation.PushAsync(
                 new ArhivetieIeradumi(
-                    Ieradums,
-                    SaglabatDatusAsync
+                    ApiService
                 )
             );
         }
+
+        // Ielādē aktuālos ieradumus no API.
         public async Task IeladetDatusAsync()
         {
-            // Dati tiek ielādēti tikai vienu reizi.
-            if (datiIeladeti)
-            {
-                return;
-            }
-            List<Ieradums> saglabatieIeradumi;
             try
             {
-                saglabatieIeradumi =
-                    await storageService.IeladetAsync();
-            }
-            catch (ArgumentException)
-            {
-                // Ja vecie saglabātie dati neatbilst jaunajai
-                // ieraduma struktūrai, izmanto testa datus.
-                saglabatieIeradumi =
-                    IeradumsTestData.IzveidotIeradumus();
+                List<Ieradums> apiIeradumi =
+                    await ApiService.IegutVisusAsync();
 
-                // Vecais lokālais fails tiek aizstāts ar jauniem datiem.
-                await storageService.SaglabatAsync(
-                    saglabatieIeradumi
-                );
-            }
-            // Pirmajā palaišanas reizē izmanto testa datus.
-            if (saglabatieIeradumi.Count == 0)
-            {
-                saglabatieIeradumi =
-                    IeradumsTestData.IzveidotIeradumus();
+                Ieradums =
+                    new ObservableCollection<Ieradums>(
+                        apiIeradumi
+                    );
 
-                await storageService.SaglabatAsync(
-                    saglabatieIeradumi
+                PropertyChanged?.Invoke(
+                    this,
+                    new PropertyChangedEventArgs(nameof(Ieradums))
+                );
+
+                AtjaunotSarakstu();
+            }
+            catch (HttpRequestException)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    "Neizdevās izveidot savienojumu ar API.",
+                    "Labi"
                 );
             }
-            Ieradums =
-                new ObservableCollection<Ieradums>(
-                    saglabatieIeradumi
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    ex.Message,
+                    "Labi"
                 );
-            datiIeladeti = true;
-        }
-        public async Task SaglabatDatusAsync()
-        {
-            await storageService.SaglabatAsync(Ieradums);
+            }
         }
     }
 }

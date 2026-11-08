@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="IeradumuParvaldnieksAPI/IeradumuParvaldnieksAPI.csproj" Id="17819a11-0070-4e76-8b5c-bacf25716256" />
+  <Project Path="IeradumuParvaldnieksApplication/IeradumuParvaldnieksApplication.csproj" Id="6d8f972d-1a69-49d9-99c9-01d43cfb1108" />
   <Project Path="IeradumuParvaldnieksDataModels/IeradumuParvaldnieksDataModels.csproj" />
   <Project Path="IeradumuParvaldnieksKlases/IeradumuParvaldnieksKlases.csproj" />
   <Project Path="IeradumuParvaldnieksKoncole/IeradumuParvaldnieksKoncole.csproj" />

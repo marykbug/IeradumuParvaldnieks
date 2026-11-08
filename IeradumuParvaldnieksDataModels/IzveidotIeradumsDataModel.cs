@@ -6,9 +6,10 @@ namespace IeradumuParvaldnieksDataModels
 {
     public class IzveidotIeradumsDataModel
     {
-        public string LietotajsID { get; set; }
-        public string Nosaukums { get; set; }
-        public string Apraksts { get; set; }
-        public string Atkartosana { get; set; }
+        public string LietotajsID { get; set; } = "";
+        public string Nosaukums { get; set; } = "";
+        public string Apraksts { get; set; } = "";
+        public string Atkartosana { get; set; } = "";
+        public List<string> NedelasDienas { get; set; } = new();
     }
 }

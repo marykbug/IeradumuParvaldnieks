@@ -1,0 +1,93 @@
+@IeradumuParvaldnieksAPI_HostAddress = http://localhost:5118
+
+### Iegūt visus ieradumus
+GET {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi
+Accept: application/json
+
+
+### Izveidot jaunu ieradumu
+POST {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi
+Content-Type: application/json
+
+{
+  "lietotajsID": "demo-user-1",
+  "nosaukums": "Mācīties C#",
+  "apraksts": "Mācīties 30 minūtes",
+  "atkartosana": "Nedela",
+  "nedelasDienas": [
+    "Pirmdiena",
+    "Tresdiena",
+    "Piektdiena"
+  ]
+}
+
+### Labot ieradumu
+PUT {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e804127d-054a-4073-be89-4eef140b0206
+Content-Type: application/json
+
+{
+  "nosaukums": "Mācīties C# katru nedēļu",
+  "apraksts": "Mācīties vismaz 45 minūtes",
+  "atkartosana": "Nedela",
+  "nedelasDienas": [
+    "Otrdiena",
+    "Ceturtdiena"
+  ]
+}
+
+### Pārbaudīt izlaboto ieradumu
+GET {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e804127d-054a-4073-be89-4eef140b0206
+Accept: application/json
+
+### Arhivēt ieradumu
+PUT {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e804127d-054a-4073-be89-4eef140b0206/arhivet
+
+### Pārbaudīt arhivēto ieradumu
+GET {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e804127d-054a-4073-be89-4eef140b0206
+Accept: application/json
+
+### Mēģināt atzīmēt arhivētu ieradumu kā izpildītu
+POST {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e804127d-054a-4073-be89-4eef140b0206/izpildes
+Content-Type: application/json
+
+{
+  "ieradumsID": "e804127d-054a-4073-be89-4eef140b0206",
+  "datums": "2026-11-08"
+}
+
+### Atzīmēt aktīvu ieradumu kā izpildītu
+POST {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/f4dff171-2013-4e0c-bd90-aaae5595d737/izpildes
+Content-Type: application/json
+
+{
+  "ieradumsID": "f4dff171-2013-4e0c-bd90-aaae5595d737",
+  "datums": "2026-11-08"
+}
+
+### Atzīmēt aktīvu ieradumu kā izpildītu
+POST {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e70a568f-e1dc-4585-8f2b-17c71c934c75/izpildes
+Content-Type: application/json
+
+{
+  "ieradumsID": "e70a568f-e1dc-4585-8f2b-17c71c934c75",
+  "datums": "2026-11-08"
+}
+
+### Iegūt ieraduma izpildes
+GET {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/e70a568f-e1dc-4585-8f2b-17c71c934c75/izpildes
+Accept: application/json
+
+### Neeksistējošs ieradums
+GET {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi/11111111-1111-1111-1111-111111111111
+Accept: application/json
+
+### Nederīgs ieraduma nosaukums
+POST {{IeradumuParvaldnieksAPI_HostAddress}}/api/ieradumi
+Content-Type: application/json
+{
+  "lietotajsID": "demo-user-1",
+  "nosaukums": "",
+  "apraksts": "Tests",
+  "atkartosana": "Diena",
+  "nedelasDienas": []
+}

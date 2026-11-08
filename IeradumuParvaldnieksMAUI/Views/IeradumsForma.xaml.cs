@@ -1,32 +1,34 @@
 using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Services;
 using IeradumuParvaldnieksMAUI.ViewModels;
-using System.Collections.ObjectModel;
+
 namespace IeradumuParvaldnieksMAUI.Views;
 
 public partial class IeradumsForma : ContentPage
 {
+    // Jauna ieraduma izveide.
     public IeradumsForma(
-    ObservableCollection<Ieradums> ieradumi,
-    string lietotajsID,
-    Func<Task> saglabatDatus)
+        APIIeradumuService apiService,
+        string lietotajsID)
     {
         InitializeComponent();
 
         BindingContext = new IeradumsFormaViewModel(
-            ieradumi,
-            lietotajsID,
-            saglabatDatus
+            apiService,
+            lietotajsID
         );
     }
+
+    // Esoša ieraduma labošana.
     public IeradumsForma(
-    Ieradums ieradums,
-    Func<Task> saglabatDatus)
+        Ieradums ieradums,
+        APIIeradumuService apiService)
     {
         InitializeComponent();
 
         BindingContext = new IeradumsFormaViewModel(
             ieradums,
-            saglabatDatus
+            apiService
         );
     }
 }
