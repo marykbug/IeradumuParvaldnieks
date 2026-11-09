@@ -1,5 +1,6 @@
 using IeradumuParvaldnieksKlases;
 using IeradumuParvaldnieksMAUI.ViewModels;
+
 namespace IeradumuParvaldnieksMAUI.Views;
 
 public partial class IeradumuSaraksts : ContentPage
@@ -9,8 +10,9 @@ public partial class IeradumuSaraksts : ContentPage
         InitializeComponent();
         BindingContext = new IeradumuSarakstsViewModel();
     }
+
     private async void IeradumsSelectionChanged(
-        object sender,
+        object? sender,
         SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.Count > 0 &&
@@ -20,11 +22,14 @@ public partial class IeradumuSaraksts : ContentPage
             await Navigation.PushAsync(
                 new IeradumsDetalas(
                     ieradums,
-                    viewModel.SaglabatDatusAsync
+                    viewModel.ApiService
                 )
             );
 
-            ((CollectionView)sender).SelectedItem = null;
+            if (sender is CollectionView collectionView)
+            {
+                collectionView.SelectedItem = null;
+            }
         }
     }
 
@@ -35,7 +40,6 @@ public partial class IeradumuSaraksts : ContentPage
         if (BindingContext is IeradumuSarakstsViewModel viewModel)
         {
             await viewModel.IeladetDatusAsync();
-            viewModel.AtjaunotSarakstu();
         }
     }
 }

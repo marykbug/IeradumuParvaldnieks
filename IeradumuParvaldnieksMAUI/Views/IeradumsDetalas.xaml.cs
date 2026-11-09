@@ -1,27 +1,30 @@
 using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Services;
 using IeradumuParvaldnieksMAUI.ViewModels;
+
 namespace IeradumuParvaldnieksMAUI.Views;
 
 public partial class IeradumsDetalas : ContentPage
 {
     public IeradumsDetalas(
-    Ieradums ieradums,
-    Func<Task> saglabatDatus)
+        Ieradums ieradums,
+        APIIeradumuService apiService)
     {
         InitializeComponent();
 
         BindingContext = new IeradumsDetalasViewModel(
             ieradums,
-            saglabatDatus
+            apiService
         );
     }
-    protected override void OnAppearing()
+
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
         if (BindingContext is IeradumsDetalasViewModel viewModel)
         {
-            viewModel.AtjaunotDatus();
+            await viewModel.AtjaunotDatusAsync();
         }
     }
 }

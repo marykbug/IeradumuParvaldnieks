@@ -1,90 +1,161 @@
-﻿using IeradumuParvaldnieksKlases;
+﻿using IeradumuParvaldnieksDataModels;
+using IeradumuParvaldnieksKlases;
+using IeradumuParvaldnieksMAUI.Services;
 using IeradumuParvaldnieksMAUI.Views;
 using System.ComponentModel;
+
 namespace IeradumuParvaldnieksMAUI.ViewModels
 {
     public partial class IeradumsDetalasViewModel : INotifyPropertyChanged
     {
+        private readonly APIIeradumuService apiService;
+
         public Ieradums Ieradums { get; set; }
-        private readonly Func<Task> saglabatDatus;
+
         public Command AtzimetKaIzpildituCommand { get; }
+        public Command ArhivetCommand { get; }
         public Command LabotCommand { get; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public IeradumsDetalasViewModel(
             Ieradums ieradums,
-            Func<Task> saglabatDatus)
+            APIIeradumuService apiService)
         {
             Ieradums = ieradums;
-            this.saglabatDatus = saglabatDatus;
+            this.apiService = apiService;
 
-            AtzimetKaIzpildituCommand = new Command(AtzimetKaIzpilditu);
-            ArhivetCommand = new Command(Arhivet);
-            LabotCommand = new Command(Labot);
+            AtzimetKaIzpildituCommand =
+                new Command(AtzimetKaIzpilditu);
+
+            ArhivetCommand =
+                new Command(Arhivet);
+
+            LabotCommand =
+                new Command(Labot);
         }
+
         public string IzpilditsSodien
         {
             get { return Ieradums.IzpilditsSodien; }
         }
-        public event PropertyChangedEventHandler? PropertyChanged;
+
         private async void AtzimetKaIzpilditu()
         {
-            if (Ieradums.IrIzpilditsSodien())
+            try
+            {
+                AtzimetIzpildiDataModel modelis =
+                    new AtzimetIzpildiDataModel
+                    {
+                        IeradumsID = Ieradums.Id,
+                        Datums = DateOnly.FromDateTime(
+                            DateTime.Today
+                        )
+                    };
+
+                await apiService.AtzimetKaIzpildituAsync(
+                    Ieradums.Id,
+                    modelis
+                );
+
+                await AtjaunotDatusAsync();
+            }
+            catch (HttpRequestException)
             {
                 await Shell.Current.DisplayAlertAsync(
-                    "Paziņojums",
-                    "Ieradums šodien jau ir izpildīts.",
+                    "Kļūda",
+                    "Neizdevās izveidot savienojumu ar API.",
                     "Labi"
                 );
-                return;
             }
-            Ieradums.AtzimetKaIzpilditu(DateOnly.FromDateTime(DateTime.Today));
-            // Saglabā izmaiņas lokālajā failā.
-            await saglabatDatus();
-
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(nameof(IzpilditsSodien))
-            );
+            catch (InvalidOperationException ex)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    ex.Message,
+                    "Labi"
+                );
+            }
         }
-        public Command ArhivetCommand { get; }
+
         private async void Arhivet()
         {
-            if (Ieradums.Status == IeradumuStatus.Arhivets)
+            try
+            {
+                await apiService.ArhivetAsync(
+                    Ieradums.Id
+                );
+
+                await AtjaunotDatusAsync();
+            }
+            catch (HttpRequestException)
             {
                 await Shell.Current.DisplayAlertAsync(
-                    "Paziņojums",
-                    "Ieradums jau ir arhivēts.",
+                    "Kļūda",
+                    "Neizdevās izveidot savienojumu ar API.",
                     "Labi"
                 );
-                return;
             }
-            Ieradums.Arhivet();
-            // Saglabā izmaiņas lokālajā failā.
-            await saglabatDatus();
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(nameof(Ieradums))
-            );
+            catch (InvalidOperationException ex)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    ex.Message,
+                    "Labi"
+                );
+            }
         }
+
         private async void Labot()
         {
             await Shell.Current.Navigation.PushAsync(
                 new IeradumsForma(
                     Ieradums,
-                    saglabatDatus
+                    apiService
                 )
             );
         }
-        public void AtjaunotDatus()
-        {
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(nameof(Ieradums))
-            );
 
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(nameof(IzpilditsSodien))
-            );
+        public async Task AtjaunotDatusAsync()
+        {
+            try
+            {
+                Ieradums? atjaunotaisIeradums =
+                    await apiService.IegutPecIdAsync(
+                        Ieradums.Id
+                    );
+
+                if (atjaunotaisIeradums == null)
+                {
+                    await Shell.Current.DisplayAlertAsync(
+                        "Kļūda",
+                        "Ieradums nav atrasts.",
+                        "Labi"
+                    );
+
+                    return;
+                }
+
+                Ieradums = atjaunotaisIeradums;
+
+                PropertyChanged?.Invoke(
+                    this,
+                    new PropertyChangedEventArgs(nameof(Ieradums))
+                );
+
+                PropertyChanged?.Invoke(
+                    this,
+                    new PropertyChangedEventArgs(nameof(IzpilditsSodien))
+                );
+            }
+            catch (HttpRequestException)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Kļūda",
+                    "Neizdevās izveidot savienojumu ar API.",
+                    "Labi"
+                );
+            }
         }
     }
 }
